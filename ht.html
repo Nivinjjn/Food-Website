@@ -1,0 +1,530 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TasteBite – Fresh & Tasty</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --brand: #f97316;      /* orange */
+      --brand-dark: #ea580c; /* deeper orange */
+      --border: #e5e7eb;
+      --shadow: 0 10px 30px rgba(0,0,0,.06);
+      --radius: 16px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif; color: var(--text); background: var(--bg); }
+
+    /* Header */
+    .header { position: fixed; inset: 0 0 auto 0; height: 64px; background: rgba(255,255,255,.85); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); z-index: 50; }
+    .wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+    .hrow { height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .logo { display: inline-flex; align-items: center; gap: 8px; border: 0; background: transparent; cursor: pointer; }
+    .logo img { width: 32px; height: 32px; transition: transform .2s ease; }
+    .logo:hover img { transform: translateY(-2px); }
+    .brand { font-weight: 800; letter-spacing: .2px; }
+
+    .nav { display: none; gap: 20px; }
+    .nav a { font-size: 14px; color: var(--text); text-decoration: none; }
+    .nav a:hover { color: var(--brand); }
+
+    .auth { display: flex; gap: 8px; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 12px; font-size: 14px; border-radius: 999px; border: 1px solid var(--border); background: #fff; cursor: pointer; text-decoration: none; color: var(--text); box-shadow: none; }
+    .btn:hover { background: #f9fafb; }
+    .btn.primary { background: var(--brand); color: #fff; border-color: var(--brand); }
+    .btn.primary:hover { background: var(--brand-dark); }
+
+    @media (min-width: 768px) { .nav { display: flex; } }
+
+    /* Main spacing offset */
+    main { padding-top: 80px; }
+
+    /* Hero slider */
+    .slider { position: relative; height: 60vh; min-height: 320px; overflow: hidden; }
+    .slide { position: absolute; inset: 0; opacity: 0; transition: opacity .6s ease; background-size: cover; background-position: center; }
+    .slide.active { opacity: 1; }
+    .slide .inner { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); background: rgba(0,0,0,.45); color: #fff; padding: 16px 20px; border-radius: 16px; text-align: center; width: min(92%, 720px); box-shadow: var(--shadow); }
+    .slide h1 { margin: 0 0 6px; font-size: clamp(22px, 5vw, 38px); }
+    .slide p { margin: 0 0 12px; font-size: clamp(12px, 2.5vw, 16px); opacity: .95; }
+
+    .dots { position: absolute; left: 16px; bottom: 16px; display: flex; gap: 8px; }
+    .dot { width: 28px; height: 8px; border-radius: 999px; background: rgba(255,255,255,.6); border: 0; cursor: pointer; }
+    .dot.active { background: #fff; }
+    .controls { position: absolute; right: 16px; bottom: 16px; display: flex; gap: 8px; }
+    .control { border: 0; background: rgba(255,255,255,.9); padding: 6px 10px; border-radius: 999px; cursor: pointer; }
+
+    /* Sections */
+    section { padding: 64px 0; }
+    .grid { display: grid; gap: 24px; }
+    @media (min-width: 768px){ .grid.cols-2 { grid-template-columns: 1fr 1fr; } }
+    @media (min-width: 1024px){ .grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; } }
+
+    .card { border: 1px solid var(--border); border-radius: var(--radius); background: #fff; box-shadow: var(--shadow); overflow: hidden; }
+    .card img { display: block; width: 100%; height: 160px; object-fit: cover; }
+    .card .body { padding: 12px; }
+    .muted { color: var(--muted); }
+
+    .container { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+
+    /* Menu grid */
+    .menu-grid { display: grid; gap: 16px; }
+    @media (min-width: 640px){ .menu-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1024px){ .menu-grid { grid-template-columns: repeat(3, 1fr); } }
+    .dish { border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; display: grid; grid-template-columns: 96px 1fr; gap: 12px; align-items: center; background: #fff; box-shadow: var(--shadow); }
+    .dish img { width: 96px; height: 96px; object-fit: cover; border-radius: 12px; }
+    .dish h4{ margin: 0; }
+    .price { font-weight: 700; }
+
+    /* Gallery */
+    .gallery { display: grid; gap: 16px; }
+    @media (min-width: 640px){ .gallery { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1024px){ .gallery { grid-template-columns: repeat(3, 1fr); } }
+    .gallery img { width: 100%; height: 240px; object-fit: cover; border-radius: var(--radius); box-shadow: var(--shadow); }
+
+    /* Footer slider (mini grid) */
+    .mini-grid { display: grid; gap: 16px; grid-template-columns: repeat(1, 1fr); }
+    @media (min-width: 640px){ .mini-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1024px){ .mini-grid { grid-template-columns: repeat(4, 1fr); } }
+    .mini { border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+    .mini img { width: 100%; height: 160px; object-fit: cover; display: block; }
+
+    footer { padding: 48px 0 80px; text-align: center; color: var(--muted); font-size: 12px; }
+
+    /* Simple page switcher using hash */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* Forms */
+    .form { max-width: 480px; margin: 0 auto; border: 1px solid var(--border); border-radius: 24px; padding: 24px; box-shadow: var(--shadow); background: #fff; }
+    .form h1 { margin: 0 0 8px; font-size: 22px; }
+    .form p { margin: 0 0 16px; color: var(--muted); font-size: 14px; }
+    .field { margin-bottom: 12px; }
+    .field label { display: block; font-size: 14px; margin-bottom: 6px; }
+    .field input, .field select, .field textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 12px; font-size: 14px; }
+    .inline { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+    .actions { display: flex; gap: 8px; }
+    /* Auth pages */
+    .auth-section { min-height: calc(100vh - 80px); display: flex; align-items: center; }
+    .auth-section.login { background: linear-gradient(180deg, #fff7ed 0%, #ffffff 40%); }
+    .auth-section.signup { background: linear-gradient(180deg, #ffffff 0%, #fef2f2 60%); }
+    .auth-layout { align-items: center; }
+    .auth-illustration { display:none; }
+    .auth-illustration img { width: 100%; height: 320px; object-fit: cover; border-radius: 24px; box-shadow: var(--shadow); display:block; }
+    @media (min-width: 768px){ .auth-illustration { display:block; } }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="wrap">
+      <div class="hrow">
+        <!-- Left: Logo (click => scroll to top and show home) -->
+        <button class="logo" id="logoBtn" aria-label="Go to top">
+          <img src="Logo.png" alt="TasteTheory Logo" />
+          <span class="brand">TasteTheory</span>
+        </button>
+
+        <!-- Middle: Nav -->
+        <!-- CHANGED ORDER HERE: Specials comes before Menu -->
+        <nav class="nav">
+          <a href="#home">Home</a>
+          <a href="#specials">Specials</a>
+          <a href="#menu">Menu</a>
+          <a href="#gallery">Gallery</a>
+          <a href="#contact">Contact</a>
+        </nav>
+
+        <!-- Right: Auth buttons -->
+        <div class="auth">
+          <a class="btn" href="#login">Login</a>
+          <a class="btn primary" href="#signup">Sign Up</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- PAGES (hash-based, no React) -->
+  <main>
+    <!-- Home page -->
+    <div id="page-home" class="page active">
+      <!-- Hero / Slider -->
+      <section id="home" class="slider" aria-label="Image slider">
+        <div class="slide active" style="background-image:url('main\ 3.jpg');">
+          <div class="inner">
+            <h1>Fresh. Fast. Flavorful.</h1>
+            <p>Handcrafted meals made with seasonal ingredients. Dine in or order online.</p>
+            <a class="btn primary" href="#menu">Explore Menu</a>
+          </div>
+        </div>
+        <div class="slide" style="background-image:url('main 2.webp');">
+          <div class="inner">
+            <h1>Comfort Food Classics</h1>
+            <p>From wood-fired pizzas to creamy pastas—your cravings, covered.</p>
+            <a class="btn" href="#specials">See Today’s Specials</a>
+          </div>
+        </div>
+        <div class="slide" style="background-image:url('main1.jpg');">
+          <div class="inner">
+            <h1>Sweet Endings</h1>
+            <p>Desserts baked daily. Save room for the best part.</p>
+            <a class="btn" href="#gallery">View Gallery</a>
+          </div>
+        </div>
+        <div class="dots" id="dots"></div>
+        <div class="controls">
+          <button class="control" id="prevBtn">Prev</button>
+          <button class="control" id="nextBtn">Next</button>
+        </div>
+      </section>
+
+      <!-- About -->
+      <section id="about">
+        <div class="container">
+          <div class="grid cols-2">
+            <div>
+              <h2>About TasteTheory</h2>
+              <p class="muted">Your neighborhood kitchen since 2025. We celebrate local produce and bold flavors. Whether it’s a quick lunch, family dinner, or a sweet treat, we’ve got something you’ll love.</p>
+              <div class="actions" style="margin-top:12px;">
+                <a class="btn primary" href="#menu">Order Now</a>
+                <a class="btn" href="#contact">Book a Table</a>
+              </div>
+            </div>
+            <div>
+              <img src="main 4.jpg" alt="Chefs preparing food" style="width:100%; height:280px; object-fit:cover; border-radius:16px; box-shadow:var(--shadow);" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Specials (cards) -->
+      <section id="specials" style="background:#fff7ed;">
+        <div class="container">
+          <h2>Today’s Specials</h2>
+          <div class="grid cols-3" style="margin-top:16px;">
+            <article class="card">
+              <img src="Margherita Pizza.jpg" alt="Margherita Pizza" />
+              <div class="body">
+                <h3>Margherita Pizza</h3>
+                <p class="muted">San Marzano, basil, mozzarella.</p>
+                <div class="actions"><button class="btn primary" onclick="alert('Added Margherita Pizza')">₹399 • Add</button></div>
+              </div>
+            </article>
+            <article class="card">
+              <img src="Spaghetti Aglio e Olio.jpg" alt="Spaghetti Aglio e Olio" />
+              <div class="body">
+                <h3>Spaghetti Aglio e Olio</h3>
+                <p class="muted">Garlic, chili, parsley, EVOO.</p>
+                <div class="actions"><button class="btn primary" onclick="alert('Added Spaghetti Aglio e Olio')">₹349 • Add</button></div>
+              </div>
+            </article>
+            <article class="card">
+              <img src="Grilled Salmon.jpg" alt="Grilled Salmon" />
+              <div class="body">
+                <h3>Grilled Salmon</h3>
+                <p class="muted">Lemon butter, herbs, veggies.</p>
+                <div class="actions"><button class="btn primary" onclick="alert('Added Grilled Salmon')">₹599 • Add</button></div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- Menu -->
+      <section id="menu">
+        <div class="container">
+          <h2>Our Menu</h2>
+          <p class="muted">Hand-picked favorites. Vegetarian and gluten-free options available.</p>
+          <div class="menu-grid" style="margin-top:16px;">
+            <div class="dish">
+              <img src="Roasted Veggie Wrap.avif" alt="Veggie Wrap" />
+              <div>
+                <h4>Veggie Wrap</h4>
+                <p class="muted">Hummus, peppers, zucchini, feta.</p>
+                <div class="price">₹279</div>
+              </div>
+            </div>
+            <div class="dish">
+              <img src="-chicken-burger-.webp" alt="Chicken Burger" />
+              <div>
+                <h4>Chicken Burger</h4>
+                <p class="muted">House pickles, special sauce.</p>
+                <div class="price">₹329</div>
+              </div>
+            </div>
+            <div class="dish">
+              <img src="Pasta.jpg" alt="Pasta" />
+              <div>
+                <h4>Pasta</h4>
+                <p class="muted">Parmesan cream, mushrooms.</p>
+                <div class="price">₹449</div>
+              </div>
+            </div>
+            <div class="dish">
+              <img src="Classic Caesar Salad.jpg" alt="Classic Caesar Salad" />
+              <div>
+                <h4>Classic Caesar Salad</h4>
+                <p class="muted">Romaine, croutons, parmesan.</p>
+                <div class="price">₹239</div>
+              </div>
+            </div>
+            <div class="dish">
+              <img src="sushi.png" alt="Sushi Platter" />
+              <div>
+                <h4>Sushi Platter (8 pcs)</h4>
+                <p class="muted">Salmon, tuna, avocado rolls.</p>
+                <div class="price">₹649</div>
+              </div>
+            </div>
+            <div class="dish">
+              <img src="Brownie Sundae.jpg" alt="Brownie Sundae" />
+              <div>
+                <h4>Brownie Sundae</h4>
+                <p class="muted">Warm brownie, ice cream, fudge.</p>
+                <div class="price">₹219</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Gallery -->
+      <section id="gallery">
+        <div class="container">
+          <h2>Gallery</h2>
+          <div class="gallery" style="margin-top:16px;">
+            <img src="Margherita Pizza.jpg" alt="Pizza close-up" />
+            <img src="salad bowl.jpg" alt="Salad bowl" />
+            <img src="Dessert plate.jpg" alt="Dessert plate" />
+          </div>
+        </div>
+      </section>
+
+      <!-- Contact/Reservation -->
+      <section id="contact" style="background:#fff7ed;">
+        <div class="container" style="max-width:640px;">
+          <h2>Reserve a Table</h2>
+          <p class="muted">Book your dining experience. We’ll confirm by email.</p>
+          <form class="form" onsubmit="event.preventDefault(); alert('Reservation requested! We\'ll contact you shortly.'); location.hash='#home';">
+            <div class="grid cols-2">
+              <div class="field"><label>Name</label><input required /></div>
+              <div class="field"><label>Email</label><input type="email" required /></div>
+            </div>
+            <div class="grid cols-2">
+              <div class="field"><label>Date</label><input type="date" required /></div>
+              <div class="field"><label>Time</label><input type="time" required /></div>
+            </div>
+            <div class="field"><label>Guests</label>
+              <select required>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5+">5+</option>
+              </select>
+            </div>
+            <div class="field"><label>Notes</label><textarea rows="3" placeholder="Allergies, high chair, occasion…"></textarea></div>
+            <button class="btn primary" type="submit" style="width:100%;">Request Reservation</button>
+          </form>
+        </div>
+      </section>
+
+      <section id="more">
+        <div class="container">
+          <h3>From Our Kitchen</h3>
+          <div class="mini-grid" style="margin-top:12px;">
+            <div class="mini"><img src="tacos.jpg" alt="Tacos" /></div>
+            <div class="mini"><img src="Pancakes.jpg" alt="Pancakes" /></div>
+            <div class="mini"><img src="smoothie.jpg" alt="Smoothie" /></div>
+            <div class="mini"><img src="steak.jpg" alt="Steak" /></div>
+          </div>
+        </div>
+      </section>
+
+      <footer>© <span id="year"></span> TasteTheory • Made with ❤️</footer>
+    </div>
+
+    <!-- Login page -->
+    <div id="page-login" class="page">
+      <section class="auth-section login">
+        <div class="container">
+          <div class="auth-layout grid cols-2">
+            <div class="auth-illustration">
+              <img src="https://images.unsplash.com/photo-1512058564366-18510be2db19?q=80&w=1200&auto=format&fit=crop" alt="Cozy cafe" />
+              <p class="muted">Welcome back! Grab your favorites in a click.</p>
+            </div>
+            <form class="form" onsubmit="event.preventDefault(); alert('Logged in! Replace with your auth logic.'); location.hash='#home';">
+              <h1>Welcome back</h1>
+              <p>Login to manage your orders</p>
+              <div class="field">
+                <label>Email</label>
+                <input type="email" required />
+              </div>
+              <div class="field">
+                <label>Password</label>
+                <input type="password" required />
+              </div>
+              <button class="btn primary" type="submit" style="width:100%;">Login</button>
+              <p class="muted" style="text-align:center; margin-top:8px;">No account? <a href="#signup">Sign up</a></p>
+            </form>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Sign up page -->
+    <div id="page-signup" class="page">
+      <section class="auth-section signup">
+        <div class="container">
+          <div class="auth-layout grid cols-2">
+            <form class="form" onsubmit="event.preventDefault(); if(!document.getElementById('agree').checked){alert('Please accept terms.'); return;} alert('Signed up! Replace with your auth logic.'); location.hash='#home';">
+              <h1>Create your account</h1>
+              <p>Order faster and track favorites</p>
+              <div class="grid cols-2">
+                <div class="field"><label>First name</label><input required /></div>
+                <div class="field"><label>Last name</label><input required /></div>
+              </div>
+              <div class="field"><label>Email</label><input type="email" required /></div>
+              <div class="field"><label>Password</label><input type="password" minlength="6" required /></div>
+              <label class="inline" style="margin:8px 0 12px;">
+                <input id="agree" type="checkbox" /> I agree to the Terms and Privacy Policy
+              </label>
+              <button class="btn primary" type="submit" style="width:100%;">Create account</button>
+              <p class="muted" style="text-align:center; margin-top:8px;">Already have an account? <a href="#login">Login</a></p>
+            </form>
+            <div class="auth-illustration">
+              <img src="Dessert plate.jpg" alt="Pasta bowl" />
+              <p class="muted">Join TasteTheory and save your go-to meals.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+document.addEventListener('DOMContentLoaded', () => {
+  const yearEl = document.getElementById('year');
+  if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+  const logoBtn = document.getElementById('logoBtn');
+  if (logoBtn) {
+    logoBtn.addEventListener('click', function(){
+      location.hash = '#home';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
+  const pages = {
+    home: document.getElementById('page-home'),
+    login: document.getElementById('page-login'),
+    signup: document.getElementById('page-signup'),
+  };
+
+  function showPage(name, options = {}) {
+    const { scrollTop = true } = options;
+    Object.values(pages).forEach(el => el && el.classList.remove('active'));
+    const target = pages[name] || pages.home;
+    if (target) target.classList.add('active');
+
+    if (scrollTop) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    maybeToggleAuto();
+  }
+
+  function handleHash() {
+    const h = (location.hash || '#home').replace('#','');
+
+    if (h === 'login') return showPage('login');
+    if (h === 'signup') return showPage('signup');
+
+    showPage('home', { scrollTop: false });
+
+    if (!h || h === 'home') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    const section = document.getElementById(h);
+    if (section) {
+      const headerOffset = 72;
+      const rect = section.getBoundingClientRect();
+      const offsetTop = rect.top + window.pageYOffset - headerOffset;
+      window.scrollTo({ top: offsetTop, behavior: 'smooth' });
+    }
+  }
+
+  window.addEventListener('hashchange', handleHash);
+
+  const slides = Array.from(document.querySelectorAll('.slider .slide'));
+  const dotsWrap = document.getElementById('dots');
+  const nextBtn = document.getElementById('nextBtn');
+  const prevBtn = document.getElementById('prevBtn');
+  const sliderEl = document.querySelector('.slider');
+
+  let current = 0;
+  let timer = null;
+
+  function hasSlides(){ return slides && slides.length > 0; }
+
+  function renderDots(){
+    if (!dotsWrap || !hasSlides()) return;
+    dotsWrap.innerHTML = '';
+    slides.forEach((_, i) => {
+      const b = document.createElement('button');
+      b.className = 'dot' + (i === current ? ' active' : '');
+      b.addEventListener('click', () => { goTo(i); restartAuto(); });
+      dotsWrap.appendChild(b);
+    });
+  }
+
+  function goTo(i){
+    if (!hasSlides()) return;
+    slides[current].classList.remove('active');
+    current = (i + slides.length) % slides.length;
+    slides[current].classList.add('active');
+    renderDots();
+  }
+
+  function next(){ goTo(current + 1); }
+  function prev(){ goTo(current - 1); }
+
+  if (nextBtn) nextBtn.addEventListener('click', () => { next(); restartAuto(); });
+  if (prevBtn) prevBtn.addEventListener('click', () => { prev(); restartAuto(); });
+
+  function startAuto(){
+    stopAuto();
+    if (!hasSlides()) return;
+    timer = setInterval(next, 3000);   // 3 seconds
+  }
+
+  function stopAuto(){ if (timer) { clearInterval(timer); timer = null; } }
+  function restartAuto(){ stopAuto(); startAuto(); }
+
+  function maybeToggleAuto(){
+    const onHome = pages.home && pages.home.classList.contains('active');
+    if (onHome) { if (!timer) startAuto(); }
+    else { stopAuto(); }
+  }
+
+  if (sliderEl) {
+    sliderEl.addEventListener('mouseenter', stopAuto);
+    sliderEl.addEventListener('mouseleave', startAuto);
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) stopAuto(); else maybeToggleAuto();
+  });
+
+  renderDots();
+  handleHash();
+});
+  </script>
+
+</body>
+</html>
